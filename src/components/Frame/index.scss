@@ -1,0 +1,68 @@
+.frame-view {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .top-bar {
+        height: 3.125rem;
+        background-color: #0747a6;
+        width: 100%;
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
+        display: flex;
+        justify-content: space-between;
+        padding-right: 1rem;
+        box-sizing: border-box;
+        align-items: center;
+
+        .right {
+            min-width: 9.75rem;
+
+            .custom-button {
+                border: none;
+                box-shadow: none;
+                background-color: #0747a6;
+
+                &:hover {
+                    background-color: #4096ff;
+                }
+            }
+
+            .close-button {
+                border: none;
+                box-shadow: none;
+                background-color: #0747a6;
+
+                &:hover {
+                    background-color: #e81123;
+                }
+            }
+        }
+    }
+
+    .bottom-bar {
+        height: 1.5625rem;
+        background-color: #0747a6;
+        -webkit-user-select: none;
+    }
+
+    .mid-view {
+        flex-grow: 1;
+        display: flex;
+
+        .mid-left {
+            width: 10rem;
+            height: 100%;
+            padding: 0.625rem;
+            box-sizing: border-box;
+        }
+
+        .mid-right {
+            background-color: #f5f5f5;
+            flex-grow: 1;
+        }
+    }
+
+}

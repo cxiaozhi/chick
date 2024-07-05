@@ -1,0 +1,30 @@
+.content-set {
+    padding: 1.25rem;
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .save-path {
+        .prefix {
+            min-width: 5rem;
+        }
+
+        .preview-box {
+            width: 21.875rem;
+            height: 1.875rem;
+            background-color: #ebebeb;
+            border-radius: .3125rem;
+            margin-left: .3125rem;
+            line-height: 1.875rem;
+            padding-left: .625rem;
+            color: #b0b0b0;
+        }
+
+        .btn-style {
+            margin-left: .625rem;
+        }
+    }
+
+}

@@ -1,0 +1,20 @@
+.singleton {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+    box-sizing: border-box;
+
+    .top {
+        display: flex;
+
+        .behind {
+            width: 100%;
+            border-bottom: .0625rem solid #e7e7e7;
+        }
+    }
+
+    .content {
+        flex-grow: 1;
+    }
+}
