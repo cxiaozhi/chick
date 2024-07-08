@@ -6,6 +6,7 @@ import Sidebar from "../Sidebar";
 import Set from "../../pages/Set";
 import Ad from "../../pages/Ad";
 import Singleton from "../../pages/Singleton";
+import GLOBAL from "../../common/global";
 
 function TopBar() {
     return (
@@ -18,7 +19,10 @@ function TopBar() {
                     type="primary"
                     icon={<MinusOutlined />}
                     onMouseUp={() => {
-                        window.ipcRenderer.send("minimize-frame");
+                        let message: Message = {
+                            eventName: "minimize-frame",
+                        };
+                        GLOBAL.ws!.send(JSON.stringify(message));
                     }}
                     className={"custom-button"}
                 />
@@ -28,7 +32,11 @@ function TopBar() {
                     type="primary"
                     icon={<ExpandAltOutlined />}
                     onMouseUp={() => {
-                        window.ipcRenderer.send("maximize-frame");
+                        let msg: Message = {
+                            eventName: "maximize-frame",
+                            params: { tabID: GLOBAL.captureTab },
+                        };
+                        GLOBAL.ws!.send(JSON.stringify(msg));
                     }}
                     className={"custom-button"}
                 />
@@ -38,7 +46,10 @@ function TopBar() {
                     type="primary"
                     icon={<CloseOutlined />}
                     onMouseUp={() => {
-                        window.ipcRenderer.send("close-frame");
+                        let message: Message = {
+                            eventName: "close-frame",
+                        };
+                        GLOBAL.ws!.send(JSON.stringify(message));
                     }}
                     className={"close-button"}
                 />

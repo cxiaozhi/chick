@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import "./index.scss";
 import { Button, Alert, message } from "antd";
+import GLOBAL from "../../common/global";
 const Set = () => {
     let dirPath = localStorage.getItem("save-path");
     let [changePath, setChangePath] = useState("");
     if (dirPath == "undefined" || !dirPath) {
-        window.ipcRenderer.invoke("get-default-path").then((res) => {
-            setChangePath(res);
-        });
+        // GLOBAL.ws!.send("get-default-path");
+        // GLOBAL.ws!.on("message", (res) => {
+        //     setChangePath("");
+        // });
     } else {
         changePath = dirPath;
     }
@@ -20,12 +22,12 @@ const Set = () => {
                 <Button
                     className="btn-style"
                     onMouseUp={() => {
-                        window.ipcRenderer.invoke("change-path").then((dirPath) => {
-                            if (dirPath) {
-                                setChangePath(dirPath);
-                                localStorage.setItem("save-path", dirPath);
-                            }
-                        });
+                        // GLOBAL.ws!.send("change-path").then((dirPath) => {
+                        //     if (dirPath) {
+                        //         setChangePath(dirPath);
+                        //         localStorage.setItem("save-path", dirPath);
+                        //     }
+                        // });
                     }}
                 >
                     选择
@@ -35,13 +37,13 @@ const Set = () => {
                     onMouseUp={() => {
                         let dirPath = localStorage.getItem("save-path");
 
-                        if (dirPath) {
-                            window.ipcRenderer.invoke("open-dir", dirPath);
-                        } else {
-                            window.ipcRenderer.invoke("get-default-path").then((res) => {
-                                window.ipcRenderer.invoke("open-dir", res);
-                            });
-                        }
+                        // if (dirPath) {
+                        //     window.ipcRenderer.invoke("open-dir", dirPath);
+                        // } else {
+                        //     window.ipcRenderer.invoke("get-default-path").then((res) => {
+                        //         window.ipcRenderer.invoke("open-dir", res);
+                        //     });
+                        // }
                     }}
                 >
                     查看

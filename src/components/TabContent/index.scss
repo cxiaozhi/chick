@@ -1,0 +1,53 @@
+@import "../../common.scss";
+
+.capture-page {
+    height: 100%;
+
+    .top {
+        margin-top: .625rem;
+        height: $search-height;
+        display: flex;
+        align-items: center;
+        margin-bottom: .625rem;
+
+
+        .left-arrow,
+        .right-arrow,
+        .update,
+        .capture-url {
+            height: $search-height;
+            display: flex;
+            border-top: .0625rem solid #d9d9d9;
+            border-bottom: .0625rem solid #d9d9d9;
+            border-left: .0625rem solid #d9d9d9;
+        }
+
+        .left-arrow,
+        .right-arrow,
+        .update {
+            width: $search-height;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .update {
+            background-color: #ffffff;
+            border-right: .0625rem solid #d9d9d9;
+        }
+
+        .left-arrow {
+            border-radius: .4375rem 0 0 .4375rem;
+        }
+
+        .input-box {
+            flex-grow: 1;
+            padding: 0 .625rem;
+        }
+
+    }
+
+    .iframe-content {
+        width: 100%;
+        height: 100%;
+    }
+}

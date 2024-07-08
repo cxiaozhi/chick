@@ -11,12 +11,15 @@
     },
     "dependencies": {
         "@ant-design/icons": "^5.3.7",
+        "bufferutil": "^4.0.8",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "ws": "^8.18.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.64",
         "@types/react-dom": "^18.2.21",
+        "@types/ws": "^8.5.10",
         "@typescript-eslint/eslint-plugin": "^7.1.1",
         "@typescript-eslint/parser": "^7.1.1",
         "@vitejs/plugin-react": "^4.2.1",
@@ -33,5 +36,8 @@
         "vite-plugin-electron": "^0.28.6",
         "vite-plugin-electron-renderer": "^0.14.5"
     },
-    "main": "dist-electron/main.js"
+    "main": "dist-electron/main.js",
+    "optionalDependencies": {
+        "utf-8-validate": "^6.0.4"
+    }
 }
