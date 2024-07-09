@@ -58,6 +58,20 @@ export default function TabContent() {
             console.log(data);
             if (data.eventName == "navigation") {
                 setCanBack(true);
+                if (data.params) {
+                    GLOBAL.TabList[GLOBAL.captureTab].search = data.params.url;
+                    let newList = [...GLOBAL.TabList];
+                    setTableList(newList);
+                }
+            } else if (data.eventName == "finish-load") {
+                console.log("finish");
+                if (data.params) {
+                    if (data.params.tabID) {
+                        GLOBAL.TabList[data.params.tabID].loadFinish = true;
+                        let newList = [...GLOBAL.TabList];
+                        setTableList(newList);
+                    }
+                }
             }
         };
     }
@@ -94,11 +108,14 @@ export default function TabContent() {
                         onPressEnter={(e) => {
                             if (GLOBAL.TabList[GLOBAL.captureTab]) {
                                 if (GLOBAL.TabList[GLOBAL.captureTab].search.includes("http")) {
-                                    let msg: Message = {
-                                        eventName: "search",
-                                        params: { tabID: GLOBAL.captureTab, url: GLOBAL.TabList[GLOBAL.captureTab].search },
-                                    };
-                                    GLOBAL.ws!.send(JSON.stringify(msg));
+                                    if (elementRef.current) {
+                                        const rect = (elementRef.current as any).getBoundingClientRect();
+                                        let msg: Message = {
+                                            eventName: "search",
+                                            params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab, url: GLOBAL.TabList[GLOBAL.captureTab].search },
+                                        };
+                                        GLOBAL.ws!.send(JSON.stringify(msg));
+                                    }
                                 } else {
                                     message.warning("您输入的网址不正确");
                                 }
@@ -117,9 +134,28 @@ export default function TabContent() {
                 </div>
                 <Button
                     type="primary"
-                    onClick={() => {
+                    onClick={async () => {
                         console.log("开始采集");
+                        GLOBAL.TabList[GLOBAL.captureTab].loadFinish = false;
+                        let newList = [...GLOBAL.TabList];
+                        setTableList(newList);
+
+                        let msg: Message = {
+                            eventName: "start-collection",
+                            params: { tabID: GLOBAL.captureTab, search: GLOBAL.TabList[GLOBAL.captureTab].search, savePath: localStorage.getItem("save-path") },
+                        };
+                        let res = await window.ipcRenderer.invoke("start-collection", msg);
+                        console.log("采集结束", res);
+                        if (!res.data) {
+                            return message.error(res.msg);
+                        }
+
+                        GLOBAL.TabList[GLOBAL.captureTab].loadFinish = true;
+                        newList = [...GLOBAL.TabList];
+                        setTableList(newList);
+                        return message.success(res.msg);
                     }}
+                    disabled={!GLOBAL.TabList[GLOBAL.captureTab].loadFinish}
                 >
                     开始采集
                 </Button>

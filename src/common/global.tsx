@@ -7,6 +7,7 @@ const GLOBAL: {
         tab: JSX.Element;
         content: JSX.Element;
         search: string;
+        loadFinish: boolean;
     }[];
     captureTab: number;
 } = {
@@ -16,6 +17,7 @@ const GLOBAL: {
             tab: <PlatformButton />,
             content: <PlatformList />,
             search: "",
+            loadFinish: false,
         },
     ],
     ws: null,

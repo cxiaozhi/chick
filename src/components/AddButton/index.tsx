@@ -17,6 +17,7 @@ export default function AddButton(params: any) {
                         props: {},
                         content: <TabContent />,
                         search: "",
+                        loadFinish: false,
                     },
                 ];
                 GLOBAL.TabList = newList;

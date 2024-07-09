@@ -1,14 +1,26 @@
 import { WebSocketServer } from "ws";
-import { BrowserWindow, WebContentsView, app, dialog, ipcMain, shell } from "electron";
+import { BrowserWindow, WebContentsView, app, dialog, ipcMain, session, shell } from "electron";
 import fs from "node:fs";
 import { MyWebview } from "./type";
-import GLOBAL from "../src/common/global";
+
+enum PlatFromEnum {
+    "taobao",
+    "tmall",
+}
+
+const errorInfo = {
+    taobaoDetail: "请采集淘宝详情页",
+    tmallDetail: "请采集天猫详情页",
+    params: "参数错误",
+    nonsupport: "不支持的平台",
+};
 
 export default class WSS {
     private static _instance: WSS;
     private wss: WebSocketServer;
     private _isMaxFrame: boolean = false;
     private _win: BrowserWindow | null = null;
+    private _dirname: string = "";
     private _ws: any = null;
     private _webViewList: MyWebview[] = [];
     constructor() {
@@ -114,6 +126,10 @@ export default class WSS {
         ipcMain.handle("next", (event, params) => {
             return this.next(params);
         });
+
+        ipcMain.handle("start-collection", async (event, params) => {
+            return await this.startCollection(params);
+        });
     }
 
     minimizeFrame() {
@@ -173,10 +189,22 @@ export default class WSS {
             tabID: params.tabID,
         };
 
+        view.webContents.addListener("did-finish-load", () => {
+            let msg: Message = {
+                eventName: "finish-load",
+                params: { tabID: params.tabID },
+            };
+            this.send(msg);
+        });
+
         view.webContents.setWindowOpenHandler((detail) => {
             console.log(detail);
             view.webContents.loadURL(detail.url);
-            this.send({ eventName: "navigation" });
+            let msg: Message = {
+                eventName: "navigation",
+                params: { url: detail.url },
+            };
+            this.send(msg);
             return { action: "deny" };
         });
         this._webViewList.push(item);
@@ -219,6 +247,7 @@ export default class WSS {
         this._webViewList.forEach((item) => {
             if (item.tabID == params.tabID) {
                 item.webView.webContents.loadURL(params.url);
+                this.showWebView(params);
             }
         });
     }
@@ -273,5 +302,104 @@ export default class WSS {
             }
         });
         return { canGoBack, canGoForward };
+    }
+
+    /** 查找webView */
+    findWebViewByTabID(params: Message): WebContentsView | null {
+        for (let index = 0; index < this._webViewList.length; index++) {
+            const element = this._webViewList[index];
+            if (element.tabID == params.params?.tabID) return element.webView;
+        }
+        return null;
+    }
+
+    /** 判断采集链接属于哪个平台 */
+    isWherePlatform(url: string) {
+        if (url.includes("taobao.com") && (url.includes("itemIds") || url.includes("item.taobao.com"))) {
+            return { data: PlatFromEnum.taobao, msg: null };
+        } else if (url.includes("tmall.com") && url.includes("detail.tmall.com")) {
+            return { data: PlatFromEnum.tmall, msg: null };
+        } else if (url.includes("taobao.com") && !url.includes("item.taobao.com")) {
+            return { data: null, msg: errorInfo.taobaoDetail };
+        } else if (url.includes("tmall.com") && !url.includes("detail.tmall.com")) {
+            return { data: null, msg: errorInfo.tmallDetail };
+        } else {
+            return { data: null, msg: errorInfo.nonsupport };
+        }
+    }
+
+    /** 校验采集信息 */
+    checkCollectionInfo(params: Message) {
+        console.log("开始采集--->", params);
+        if (params.params) {
+            let platfrom = this.isWherePlatform(params.params.search);
+            if (platfrom.data === null) {
+                return { data: false, msg: platfrom.msg };
+            } else {
+                return { data: true, msg: platfrom.data };
+            }
+        } else {
+            return { data: false, msg: errorInfo.params };
+        }
+    }
+
+    /** 开始采集 */
+    startCollection(params: Message) {
+        let checkRes = this.checkCollectionInfo(params);
+        if (!checkRes.data) return checkRes;
+        switch (checkRes.msg) {
+            case PlatFromEnum.taobao:
+                return this.collectionTaobao(params);
+            case PlatFromEnum.tmall:
+                return this.collectionTMall(params);
+        }
+    }
+
+    /** 采集淘宝 */
+    async collectionTaobao(params: Message) {
+        let webView: WebContentsView | null = this.findWebViewByTabID(params);
+        if (!webView) return null;
+        webView.webContents.on("console-message", (event, level, message, line, sourceId) => {
+            if (message.includes("测试")) {
+                console.log("event: %s, level: %s, message: %s, line: %s, sourceId: %s", event, level, message, line, sourceId);
+            }
+        });
+
+        let jsScript = fs.readFileSync("./electron/template.ts", "utf8");
+        const res = await webView.webContents.executeJavaScript(`${jsScript}`);
+        let savePath = params.params?.savePath;
+        if (!savePath) {
+            savePath = app.getPath("desktop") + "\\采集结果\\";
+        }
+        await this.downloadVideo(webView, savePath, res[0]);
+
+        return { data: true, msg: "采集完成" };
+    }
+
+    /** 采集天猫 */
+    collectionTMall(params: Message) {
+        let webView: WebContentsView | null = this.findWebViewByTabID(params);
+        if (!webView) return null;
+        webView.webContents;
+        return { data: true, msg: "采集完成" };
+    }
+
+    /** 给weiview添加事件 */
+    addLoadListener(view: WebContentsView) {}
+
+    /** 切换标签 */
+
+    /** 下载视频 */
+    downloadVideo(view: WebContentsView, savePath: string, downloadURL: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            view.webContents.session.on("will-download", (e, item, webContents) => {
+                savePath = savePath + item.getFilename();
+                item.setSavePath(savePath);
+                console.log(e, savePath, webContents);
+                resolve();
+            });
+
+            view.webContents.downloadURL(downloadURL);
+        });
     }
 }
