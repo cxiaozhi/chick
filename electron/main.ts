@@ -2,7 +2,6 @@ import { app, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import WSS from "./ws";
-import { listenIpcRender } from "./Utils";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -48,7 +47,6 @@ function createWindow() {
     }
 
     WSS.I.init(win);
-    listenIpcRender(win);
 }
 
 app.commandLine.appendSwitch("ignore-certificate-errors");

@@ -1,7 +1,8 @@
 import { WebSocketServer } from "ws";
-import { BrowserWindow, WebContentsView, app, dialog, shell } from "electron";
+import { BrowserWindow, WebContentsView, app, dialog, ipcMain, shell } from "electron";
 import fs from "node:fs";
 import { MyWebview } from "./type";
+import GLOBAL from "../src/common/global";
 
 export default class WSS {
     private static _instance: WSS;
@@ -79,17 +80,40 @@ export default class WSS {
             case "hide-all-webview":
                 this.hideAllWebview();
                 break;
-            case "back":
-                this.back(message.params);
-                break;
-            case "next":
-                this.next(message.params);
-                break;
         }
     }
 
     init(params: BrowserWindow) {
         this._win = params;
+        this.listenIpcRender();
+    }
+
+    listenIpcRender() {
+        ipcMain.handle("change-path", async () => {
+            if (this._win) {
+                const change = await dialog.showOpenDialog(this._win, { properties: ["openDirectory"] });
+                if (!change.canceled) {
+                    return change.filePaths[0];
+                }
+            }
+        });
+        ipcMain.handle("open-dir", (event, dirPath) => {
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath);
+            }
+            shell.showItemInFolder(dirPath);
+        });
+        ipcMain.handle("get-default-path", () => {
+            return app.getPath("desktop") + "\\采集结果";
+        });
+
+        ipcMain.handle("back", (event, params) => {
+            return this.back(params);
+        });
+
+        ipcMain.handle("next", (event, params) => {
+            return this.next(params);
+        });
     }
 
     minimizeFrame() {
@@ -136,8 +160,8 @@ export default class WSS {
         return app.getPath("desktop") + "\\采集结果";
     }
 
-    send(message: string) {
-        this._ws.send(message);
+    send(message: Message) {
+        this._ws.send(JSON.stringify(message));
     }
 
     createWebContentsView(params: any) {
@@ -152,7 +176,7 @@ export default class WSS {
         view.webContents.setWindowOpenHandler((detail) => {
             console.log(detail);
             view.webContents.loadURL(detail.url);
-
+            this.send({ eventName: "navigation" });
             return { action: "deny" };
         });
         this._webViewList.push(item);
@@ -222,7 +246,32 @@ export default class WSS {
     }
 
     /** 后退 */
-    back(params: any) {}
+    back(params: any) {
+        console.log("后退");
+
+        let canGoBack: boolean = false;
+        let canGoForward: boolean = false;
+        this._webViewList.forEach((item) => {
+            if (item.tabID == params.tabID) {
+                item.webView.webContents.goBack();
+                canGoBack = item.webView.webContents.canGoBack();
+                canGoForward = item.webView.webContents.canGoForward();
+            }
+        });
+
+        return { canGoBack, canGoForward };
+    }
     /** 前进 */
-    next(params: any) {}
+    next(params: any) {
+        let canGoBack: boolean = false;
+        let canGoForward: boolean = false;
+        this._webViewList.forEach((item) => {
+            if (item.tabID == params.tabID) {
+                item.webView.webContents.goForward();
+                canGoBack = item.webView.webContents.canGoBack();
+                canGoForward = item.webView.webContents.canGoForward();
+            }
+        });
+        return { canGoBack, canGoForward };
+    }
 }

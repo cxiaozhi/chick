@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import GLOBAL from "../../common/global";
 export default function TabContent() {
     const [tableList, setTableList] = useState(GLOBAL.TabList);
-    console.log("---->", tableList, GLOBAL.captureTab);
+    const [canBack, setCanBack] = useState(false);
+    const [canNext, setCanNext] = useState(false);
+
     const elementRef = useRef(null);
     const updateWebView = (react: DOMRectReadOnly) => {
         if (elementRef.current) {
@@ -50,15 +52,38 @@ export default function TabContent() {
             intersectionObserver.disconnect();
         };
     }, []);
+    if (GLOBAL.ws) {
+        GLOBAL.ws.onmessage = (event) => {
+            let data: Message = JSON.parse(event.data);
+            console.log(data);
+            if (data.eventName == "navigation") {
+                setCanBack(true);
+            }
+        };
+    }
 
     return (
         <div className="capture-page">
             <div className="top">
-                <div className="left-arrow">
-                    <ArrowLeftOutlined />
+                <div className={canBack ? "left-arrow" : "left-arrow gray"}>
+                    <ArrowLeftOutlined
+                        onClick={() => {
+                            window.ipcRenderer.invoke("back", { tabID: GLOBAL.captureTab }).then((res) => {
+                                setCanBack(res.canGoBack);
+                                setCanNext(res.canGoForward);
+                            });
+                        }}
+                    />
                 </div>
-                <div className="right-arrow">
-                    <ArrowRightOutlined />
+                <div className={canNext ? "right-arrow" : "right-arrow gray"}>
+                    <ArrowRightOutlined
+                        onClick={() => {
+                            window.ipcRenderer.invoke("next", { tabID: GLOBAL.captureTab }).then((res) => {
+                                setCanBack(res.canGoBack);
+                                setCanNext(res.canGoForward);
+                            });
+                        }}
+                    />
                 </div>
                 <div className="update">
                     <ReloadOutlined />
