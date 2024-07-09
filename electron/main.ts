@@ -1,10 +1,8 @@
-import { app, BrowserWindow, session } from "electron";
-import { createRequire } from "node:module";
+import { app, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import WSS from "./ws";
-
-const require = createRequire(import.meta.url);
+import { listenIpcRender } from "./Utils";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,7 +24,6 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, "preload.mjs"),
             webSecurity: false,
-            contextIsolation: false,
             nodeIntegration: true,
             allowRunningInsecureContent: true,
         },
@@ -39,14 +36,8 @@ function createWindow() {
         win?.webContents.send("main-process-message", new Date().toLocaleString());
     });
     win.webContents.openDevTools();
-
-    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-        callback({
-            responseHeaders: {
-                ...details.responseHeaders,
-                "Content-Security-Policy": ["frame-ancestors *"],
-            },
-        });
+    win.webContents.on("will-navigate", (e, url) => {
+        e.preventDefault();
     });
 
     if (VITE_DEV_SERVER_URL) {
@@ -57,6 +48,7 @@ function createWindow() {
     }
 
     WSS.I.init(win);
+    listenIpcRender(win);
 }
 
 app.commandLine.appendSwitch("ignore-certificate-errors");

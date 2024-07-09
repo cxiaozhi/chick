@@ -16,6 +16,7 @@ export default function AddButton(params: any) {
                         tab: <CapturePageButton />,
                         props: {},
                         content: <TabContent />,
+                        search: "",
                     },
                 ];
                 GLOBAL.TabList = newList;
@@ -26,6 +27,7 @@ export default function AddButton(params: any) {
                     params: { tabID: id, x: 0, y: 0, width: 0, height: 0 },
                 };
                 GLOBAL.ws!.send(JSON.stringify(msg));
+                GLOBAL.ws!.send(JSON.stringify({ eventName: "hide-all-webview" }));
             }}
         >
             <PlusOutlined />

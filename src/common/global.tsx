@@ -6,6 +6,7 @@ const GLOBAL: {
         props: {};
         tab: JSX.Element;
         content: JSX.Element;
+        search: string;
     }[];
     captureTab: number;
 } = {
@@ -14,6 +15,7 @@ const GLOBAL: {
             props: {},
             tab: <PlatformButton />,
             content: <PlatformList />,
+            search: "",
         },
     ],
     ws: null,

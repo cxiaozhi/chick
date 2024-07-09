@@ -76,6 +76,15 @@ export default class WSS {
             case "del-webview":
                 this.delCaptureTab(message.params);
                 break;
+            case "hide-all-webview":
+                this.hideAllWebview();
+                break;
+            case "back":
+                this.back(message.params);
+                break;
+            case "next":
+                this.next(message.params);
+                break;
         }
     }
 
@@ -90,12 +99,12 @@ export default class WSS {
     }
 
     maximizeFrame(params: Params) {
-        if (this._win && !this._isMaxFrame) {
-            this._win.maximize();
-            this._isMaxFrame = true;
-        } else if (this._win && this._isMaxFrame) {
-            this._win.restore();
-            this._isMaxFrame = false;
+        if (this._win) {
+            if (this._win.isMaximized()) {
+                this._win.restore();
+            } else {
+                this._win.maximize();
+            }
         }
     }
 
@@ -139,6 +148,13 @@ export default class WSS {
             webView: view,
             tabID: params.tabID,
         };
+
+        view.webContents.setWindowOpenHandler((detail) => {
+            console.log(detail);
+            view.webContents.loadURL(detail.url);
+
+            return { action: "deny" };
+        });
         this._webViewList.push(item);
         this._win!.contentView.addChildView(view);
         if (params.url) {
@@ -196,4 +212,17 @@ export default class WSS {
         this._webViewList.splice(params.tabID - 1, 1);
         console.log("webview剩余:", this._webViewList.length);
     }
+
+    /** 隐藏所有webview */
+    hideAllWebview() {
+        console.log("隐藏所有webview");
+        this._webViewList.forEach((item) => {
+            item.webView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        });
+    }
+
+    /** 后退 */
+    back(params: any) {}
+    /** 前进 */
+    next(params: any) {}
 }
