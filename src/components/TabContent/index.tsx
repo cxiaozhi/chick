@@ -160,14 +160,7 @@ export default function TabContent() {
                     开始采集
                 </Button>
             </div>
-            <div
-                ref={elementRef}
-                className="iframe-content"
-                onClick={(e) => {
-                    console.log(e);
-                }}
-                id="my-webview"
-            ></div>
+            <div ref={elementRef} className="iframe-content" id="my-webview"></div>
         </div>
     );
 }

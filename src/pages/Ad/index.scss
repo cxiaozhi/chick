@@ -1,0 +1,24 @@
+.extension {
+    padding: 1.25rem;
+
+    .row {
+        display: flex;
+        align-items: center;
+        height: 1.5rem;
+        line-height: 1.5rem;
+
+        .prefix {
+            margin-right: .3125rem;
+        }
+
+        .qq-group {
+            color: #8594b3;
+            cursor: pointer;
+
+            &:hover {
+                color: #576b95;
+            }
+        }
+    }
+
+}

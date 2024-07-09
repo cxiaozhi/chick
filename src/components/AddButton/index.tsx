@@ -3,12 +3,14 @@ import "./index.scss";
 import CapturePageButton from "../CapturePageButton";
 import GLOBAL from "../../common/global";
 import TabContent from "../TabContent";
+import { message } from "antd";
 
 export default function AddButton(params: any) {
     return (
         <div
             className="add-button"
             onClick={() => {
+                if (GLOBAL.TabList.length >= 6) return message.warning("当前页签创建已达最大值");
                 let id = params.props.tabList[0].length;
                 let newList = [
                     ...params.props.tabList[0],

@@ -1,4 +1,4 @@
-import { CloseOutlined, DownloadOutlined, ExpandAltOutlined, MinusOutlined, SettingOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownloadOutlined, ExpandAltOutlined, MinusOutlined, SettingOutlined, SoundOutlined } from "@ant-design/icons";
 import "./index.scss";
 import { useState } from "react";
 import { Button } from "antd";
@@ -65,19 +65,19 @@ function BottomBar() {
 const menuList = [
     {
         key: 1,
-        label: "设置",
+        label: "采集设置",
         icon: <SettingOutlined />,
     },
     {
-        label: "采集",
+        label: "内容采集",
         key: 2,
         icon: <DownloadOutlined />,
     },
-    // {
-    //     label: "推广",
-    //     key: 3,
-    //     icon: <SoundOutlined />,
-    // },
+    {
+        label: "交流互助",
+        key: 3,
+        icon: <SoundOutlined />,
+    },
 ];
 
 function showContent(resState: [number, React.Dispatch<React.SetStateAction<number>>]) {
