@@ -402,4 +402,7 @@ export default class WSS {
             view.webContents.downloadURL(downloadURL);
         });
     }
+
+    /** 采集小红书 */
+    collectionXHS(params: Message) {}
 }
