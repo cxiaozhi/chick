@@ -30,10 +30,6 @@ if (!GLOBAL.ws) {
     if (GLOBAL.ws) {
         GLOBAL.ws.onopen = () => {
             console.log("客户端socket连接成功");
-            const message: Message = {
-                eventName: "Hello from renderer!",
-            };
-            GLOBAL.ws!.send(JSON.stringify(message));
         };
 
         GLOBAL.ws.onmessage = (event) => {

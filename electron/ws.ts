@@ -2,10 +2,12 @@ import { WebSocketServer } from "ws";
 import { BrowserWindow, WebContentsView, app, dialog, ipcMain, session, shell } from "electron";
 import fs from "node:fs";
 import { MyWebview } from "./type";
+import downloadXHS from "./downloadXHS";
 
 enum PlatFromEnum {
     "taobao",
     "tmall",
+    "xhs",
 }
 
 const errorInfo = {
@@ -323,6 +325,8 @@ export default class WSS {
             return { data: null, msg: errorInfo.taobaoDetail };
         } else if (url.includes("tmall.com") && !url.includes("detail.tmall.com")) {
             return { data: null, msg: errorInfo.tmallDetail };
+        } else if (url.includes("xhslink.com")) {
+            return { data: PlatFromEnum.xhs, msg: null };
         } else {
             return { data: null, msg: errorInfo.nonsupport };
         }
@@ -352,7 +356,18 @@ export default class WSS {
                 return this.collectionTaobao(params);
             case PlatFromEnum.tmall:
                 return this.collectionTMall(params);
+            case PlatFromEnum.xhs:
+                return this.collectionXHS(params);
         }
+    }
+
+    /** 获取保存路径 */
+    getSavePath(params: Message) {
+        let savePath = params.params?.savePath;
+        if (!savePath) {
+            savePath = app.getPath("desktop") + "\\采集结果\\";
+        }
+        return savePath;
     }
 
     /** 采集淘宝 */
@@ -365,14 +380,12 @@ export default class WSS {
             }
         });
 
-        let jsScript = fs.readFileSync("./electron/template.ts", "utf8");
+        let jsScript = fs.readFileSync("./electron/tbJS.ts", "utf8");
         const res = await webView.webContents.executeJavaScript(`${jsScript}`);
-        let savePath = params.params?.savePath;
-        if (!savePath) {
-            savePath = app.getPath("desktop") + "\\采集结果\\";
+        for (let index = 0; index < res.length; index++) {
+            const url = res[index];
+            await this.downloadRes(webView, this.getSavePath(params), url);
         }
-        await this.downloadVideo(webView, savePath, res[0]);
-
         return { data: true, msg: "采集完成" };
     }
 
@@ -389,13 +402,13 @@ export default class WSS {
 
     /** 切换标签 */
 
-    /** 下载视频 */
-    downloadVideo(view: WebContentsView, savePath: string, downloadURL: string): Promise<void> {
+    /** 下载视频 图片 */
+    downloadRes(view: WebContentsView, savePath: string, downloadURL: string): Promise<void> {
         return new Promise((resolve, reject) => {
             view.webContents.session.on("will-download", (e, item, webContents) => {
+                item.getMimeType();
                 savePath = savePath + item.getFilename();
                 item.setSavePath(savePath);
-                console.log(e, savePath, webContents);
                 resolve();
             });
 
@@ -403,6 +416,20 @@ export default class WSS {
         });
     }
 
+    /** 下载图片 */
+
     /** 采集小红书 */
-    collectionXHS(params: Message) {}
+    async collectionXHS(params: Message) {
+        console.log("采集小红书");
+        let webView: WebContentsView | null = this.findWebViewByTabID(params);
+        if (!webView) return null;
+        if (params.params) {
+            let urlList = await downloadXHS.downloadImage(params.params.search);
+            for (let index = 0; index < urlList.length; index++) {
+                const url = urlList[index];
+                await this.downloadRes(webView, this.getSavePath(params), url);
+            }
+            return { data: true, msg: "采集完成" };
+        }
+    }
 }
