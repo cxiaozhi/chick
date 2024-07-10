@@ -215,6 +215,9 @@ export default class WSS {
             view.webContents.loadURL(params.url);
         }
         view.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
+        if (params.isNav) {
+            view.webContents.send("enter");
+        }
     }
 
     updateWebView(params: any) {
@@ -237,7 +240,6 @@ export default class WSS {
                 if (item.tabID != params.tabID) {
                     item.webView.setBounds({ x: params.x, y: params.y, width: 0, height: 0 });
                 } else {
-                    console.log("显示");
                     item.webView.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
                 }
             });

@@ -1,3 +1,28 @@
 .platform-list {
     padding: 1.875rem;
+    display: flex;
+
+    .platform-icon {
+        width: 6.25rem;
+        height: 6.25rem;
+        margin: .625rem;
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: .625rem;
+
+        img {
+            width: 6.875rem;
+            height: 6.875rem;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+
+    }
 }

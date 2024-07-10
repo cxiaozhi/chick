@@ -7,8 +7,10 @@ export default function TabContent() {
     const [tableList, setTableList] = useState(GLOBAL.TabList);
     const [canBack, setCanBack] = useState(false);
     const [canNext, setCanNext] = useState(false);
-
     const elementRef = useRef(null);
+    window.ipcRenderer.on("enter", () => {
+        console.log("收到");
+    });
     const updateWebView = (react: DOMRectReadOnly) => {
         if (elementRef.current) {
             const rect = (elementRef.current as any).getBoundingClientRect();
@@ -27,6 +29,23 @@ export default function TabContent() {
                 params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab },
             };
             GLOBAL.ws!.send(JSON.stringify(msg));
+        }
+    };
+
+    const enter = (e?: any) => {
+        if (GLOBAL.TabList[GLOBAL.captureTab]) {
+            if (GLOBAL.TabList[GLOBAL.captureTab].search.includes("http")) {
+                if (elementRef.current) {
+                    const rect = (elementRef.current as any).getBoundingClientRect();
+                    let msg: Message = {
+                        eventName: "search",
+                        params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab, url: GLOBAL.TabList[GLOBAL.captureTab].search },
+                    };
+                    GLOBAL.ws!.send(JSON.stringify(msg));
+                }
+            } else {
+                message.warning("您输入的网址不正确");
+            }
         }
     };
 
@@ -105,28 +124,12 @@ export default function TabContent() {
                 <div className="input-box">
                     <Input
                         className="capture-url"
-                        onPressEnter={(e) => {
-                            if (GLOBAL.TabList[GLOBAL.captureTab]) {
-                                if (GLOBAL.TabList[GLOBAL.captureTab].search.includes("http")) {
-                                    if (elementRef.current) {
-                                        const rect = (elementRef.current as any).getBoundingClientRect();
-                                        let msg: Message = {
-                                            eventName: "search",
-                                            params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab, url: GLOBAL.TabList[GLOBAL.captureTab].search },
-                                        };
-                                        GLOBAL.ws!.send(JSON.stringify(msg));
-                                    }
-                                } else {
-                                    message.warning("您输入的网址不正确");
-                                }
-                            }
-                        }}
+                        onPressEnter={(event) => enter(event)}
                         value={GLOBAL.TabList[GLOBAL.captureTab]?.search}
                         onChange={(e) => {
                             if (GLOBAL.TabList[GLOBAL.captureTab]) {
                                 GLOBAL.TabList[GLOBAL.captureTab].search = e.target.value;
                                 let newList = [...tableList];
-                                console.log("---->", newList);
                                 setTableList(newList);
                             }
                         }}
