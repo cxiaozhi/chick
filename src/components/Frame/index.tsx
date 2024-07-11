@@ -1,6 +1,6 @@
 import { CloseOutlined, DownloadOutlined, ExpandAltOutlined, MinusOutlined, SettingOutlined, SoundOutlined } from "@ant-design/icons";
 import "./index.scss";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "antd";
 import Sidebar from "../Sidebar";
 import Set from "../../pages/Set";
@@ -93,7 +93,7 @@ function showContent(resState: [number, React.Dispatch<React.SetStateAction<numb
     }
 }
 
-export function MidView() {
+export const MidView = React.memo(() => {
     const resState = useState(1);
     const enterState = useState(0);
     return (
@@ -106,9 +106,9 @@ export function MidView() {
             <div className="mid-right">{showContent(resState)}</div>
         </div>
     );
-}
+});
 
-export function Frame() {
+export const Frame = React.memo(() => {
     return (
         <div className="frame-view">
             <TopBar></TopBar>
@@ -116,4 +116,4 @@ export function Frame() {
             <BottomBar></BottomBar>
         </div>
     );
-}
+});

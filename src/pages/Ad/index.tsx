@@ -1,5 +1,6 @@
 import { message } from "antd";
 import "./index.scss";
+import React from "react";
 const Ad = () => {
     return (
         <div className="extension">
@@ -20,4 +21,4 @@ const Ad = () => {
     );
 };
 
-export default Ad;
+export default React.memo(Ad);

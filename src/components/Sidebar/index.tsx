@@ -1,3 +1,4 @@
+import React from "react";
 import "./index.scss";
 
 const Sidebar = (props: { id: number; label: string; icon: JSX.Element; params: any; enterState: any }) => {
@@ -33,4 +34,4 @@ const Sidebar = (props: { id: number; label: string; icon: JSX.Element; params: 
     );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

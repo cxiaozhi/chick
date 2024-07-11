@@ -2,23 +2,34 @@ import React, { useState } from "react";
 import "./index.scss";
 import CapturePage from "../../components/CapturePage";
 import AddButton from "../../components/AddButton";
-import GLOBAL from "../../common/global";
+import { useSelector } from "react-redux";
+import { Tab } from "@/features/global/reducer";
+import PlatformButton from "@/components/PlatformButton";
+import CapturePageButton from "@/components/CapturePageButton";
 
 const Singleton = () => {
-    const activeTab = useState(0);
-    const tabList = useState(GLOBAL.TabList);
-    GLOBAL.captureTab = activeTab[0];
+    console.log("Singleton");
+    const global = useSelector((state: any) => state.globalReducer);
+    console.log(global);
+
+    const tapButton = (item: any, index: number) => {
+        if (item.tab == Tab.platformListTab) {
+            return <PlatformButton id={index}></PlatformButton>;
+        } else {
+            return <CapturePageButton id={index}></CapturePageButton>;
+        }
+    };
+
     return (
         <div className="singleton">
             <div className="top">
-                {tabList[0].map((item, index) => {
-                    item.props = { activeTab, id: index, tabList };
-                    return <div key={index}>{React.cloneElement(item.tab, item.props)}</div>;
+                {global.TabList.map((item: any, index: any) => {
+                    return <div key={index}>{tapButton(item, index)}</div>;
                 })}
-                <div className="behind">{<AddButton props={{ tabList, activeTab }} />}</div>
+                <div className="behind">{<AddButton />}</div>
             </div>
-            <div className="content">{<CapturePage props={{ tabList, activeTab }} />}</div>
+            <div className="content">{<CapturePage />}</div>
         </div>
     );
 };
-export default Singleton;
+export default React.memo(Singleton);

@@ -1,45 +1,24 @@
 import { ArrowLeftOutlined, ArrowRightOutlined, ReloadOutlined } from "@ant-design/icons";
 import "./index.scss";
 import { Input, Button, message } from "antd";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import GLOBAL from "../../common/global";
-export default function TabContent() {
-    const [tableList, setTableList] = useState(GLOBAL.TabList);
+import { useDispatch, useSelector } from "react-redux";
+import { updateNodePos, updateRect, updateTabBar } from "@/features/global/reducer";
+function TabContent() {
+    const global = useSelector((state: any) => state.globalReducer);
+    const dispatch = useDispatch();
     const [canBack, setCanBack] = useState(false);
     const [canNext, setCanNext] = useState(false);
     const elementRef = useRef(null);
-    window.ipcRenderer.on("enter", () => {
-        console.log("收到");
-    });
-    const updateWebView = (react: DOMRectReadOnly) => {
-        if (elementRef.current) {
-            const rect = (elementRef.current as any).getBoundingClientRect();
-            let msg: Message = {
-                eventName: "update-webview",
-                params: { x: rect.x, y: rect.y, width: react.width, height: react.height, tabID: GLOBAL.captureTab },
-            };
-            GLOBAL.ws!.send(JSON.stringify(msg));
-        }
-    };
-    const showWebview = () => {
-        if (elementRef.current) {
-            const rect = (elementRef.current as any).getBoundingClientRect();
-            let msg: Message = {
-                eventName: "show-webview",
-                params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab },
-            };
-            GLOBAL.ws!.send(JSON.stringify(msg));
-        }
-    };
 
     const enter = (e?: any) => {
-        if (GLOBAL.TabList[GLOBAL.captureTab]) {
-            if (GLOBAL.TabList[GLOBAL.captureTab].search.includes("http")) {
+        if (global.TabList[global.captureTab]) {
+            if (global.TabList[global.captureTab].search.includes("http")) {
                 if (elementRef.current) {
-                    const rect = (elementRef.current as any).getBoundingClientRect();
                     let msg: Message = {
                         eventName: "search",
-                        params: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, tabID: GLOBAL.captureTab, url: GLOBAL.TabList[GLOBAL.captureTab].search },
+                        params: { x: global.rect.x, y: global.rect.y, width: global.rect.width, height: global.rect.height, tabID: global.captureTab, url: global.TabList[global.captureTab].search },
                     };
                     GLOBAL.ws!.send(JSON.stringify(msg));
                 }
@@ -49,16 +28,17 @@ export default function TabContent() {
         }
     };
 
-    useEffect(showWebview, []);
     useEffect(() => {
         const resizeObserver = new ResizeObserver((entries) => {
             entries.forEach((entry) => {
-                updateWebView(entry.contentRect);
+                dispatch(updateRect({ width: entry.contentRect.width, height: entry.contentRect.height }));
             });
         });
 
         const intersectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {});
+            entries.forEach((entry) => {
+                dispatch(updateNodePos({ x: entry.intersectionRect.x, y: entry.intersectionRect.y }));
+            });
         });
 
         if (elementRef.current) {
@@ -71,6 +51,7 @@ export default function TabContent() {
             intersectionObserver.disconnect();
         };
     }, []);
+
     if (GLOBAL.ws) {
         GLOBAL.ws.onmessage = (event) => {
             let data: Message = JSON.parse(event.data);
@@ -78,17 +59,13 @@ export default function TabContent() {
             if (data.eventName == "navigation") {
                 setCanBack(true);
                 if (data.params) {
-                    GLOBAL.TabList[GLOBAL.captureTab].search = data.params.url;
-                    let newList = [...GLOBAL.TabList];
-                    setTableList(newList);
+                    dispatch(updateTabBar({ search: data.params.url, tabID: global.captureTab }));
                 }
             } else if (data.eventName == "finish-load") {
                 console.log("finish");
                 if (data.params) {
                     if (data.params.tabID) {
-                        GLOBAL.TabList[data.params.tabID].loadFinish = true;
-                        let newList = [...GLOBAL.TabList];
-                        setTableList(newList);
+                        dispatch(updateTabBar({ loadFinish: true, tabID: data.params.tabID }));
                     }
                 }
             }
@@ -101,7 +78,7 @@ export default function TabContent() {
                 <div className={canBack ? "left-arrow" : "left-arrow gray"}>
                     <ArrowLeftOutlined
                         onClick={() => {
-                            window.ipcRenderer.invoke("back", { tabID: GLOBAL.captureTab }).then((res) => {
+                            window.ipcRenderer.invoke("back", { tabID: global.captureTab }).then((res) => {
                                 setCanBack(res.canGoBack);
                                 setCanNext(res.canGoForward);
                             });
@@ -111,7 +88,7 @@ export default function TabContent() {
                 <div className={canNext ? "right-arrow" : "right-arrow gray"}>
                     <ArrowRightOutlined
                         onClick={() => {
-                            window.ipcRenderer.invoke("next", { tabID: GLOBAL.captureTab }).then((res) => {
+                            window.ipcRenderer.invoke("next", { tabID: global.captureTab }).then((res) => {
                                 setCanBack(res.canGoBack);
                                 setCanNext(res.canGoForward);
                             });
@@ -125,13 +102,9 @@ export default function TabContent() {
                     <Input
                         className="capture-url"
                         onPressEnter={(event) => enter(event)}
-                        value={GLOBAL.TabList[GLOBAL.captureTab]?.search}
+                        value={global.TabList[global.captureTab]?.search}
                         onChange={(e) => {
-                            if (GLOBAL.TabList[GLOBAL.captureTab]) {
-                                GLOBAL.TabList[GLOBAL.captureTab].search = e.target.value;
-                                let newList = [...tableList];
-                                setTableList(newList);
-                            }
+                            dispatch(updateTabBar({ search: e.target.value, tabID: global.captureTab }));
                         }}
                     ></Input>
                 </div>
@@ -139,13 +112,11 @@ export default function TabContent() {
                     type="primary"
                     onClick={async () => {
                         console.log("开始采集");
-                        GLOBAL.TabList[GLOBAL.captureTab].loadFinish = false;
-                        let newList = [...GLOBAL.TabList];
-                        setTableList(newList);
 
+                        dispatch(updateTabBar({ loadFinish: false, tabID: global.captureTab }));
                         let msg: Message = {
                             eventName: "start-collection",
-                            params: { tabID: GLOBAL.captureTab, search: GLOBAL.TabList[GLOBAL.captureTab].search, savePath: localStorage.getItem("save-path") },
+                            params: { tabID: global.captureTab, search: global.TabList[global.captureTab].search, savePath: localStorage.getItem("save-path") },
                         };
                         let res = await window.ipcRenderer.invoke("start-collection", msg);
                         console.log("采集结束", res);
@@ -153,12 +124,10 @@ export default function TabContent() {
                             return message.error(res.msg);
                         }
 
-                        GLOBAL.TabList[GLOBAL.captureTab].loadFinish = true;
-                        newList = [...GLOBAL.TabList];
-                        setTableList(newList);
+                        dispatch(updateTabBar({ loadFinish: true, tabID: global.captureTab }));
                         return message.success(res.msg);
                     }}
-                    disabled={!GLOBAL.TabList[GLOBAL.captureTab].loadFinish}
+                    disabled={!global.TabList[global.captureTab].loadFinish}
                 >
                     开始采集
                 </Button>
@@ -167,3 +136,5 @@ export default function TabContent() {
         </div>
     );
 }
+
+export default React.memo(TabContent);

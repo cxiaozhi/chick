@@ -215,9 +215,7 @@ export default class WSS {
             view.webContents.loadURL(params.url);
         }
         view.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
-        if (params.isNav) {
-            view.webContents.send("enter");
-        }
+        console.log("webview剩余:", this._webViewList.length, this._webViewList);
     }
 
     updateWebView(params: any) {
@@ -262,12 +260,13 @@ export default class WSS {
         this._webViewList.forEach((item) => {
             if (item.tabID == params.tabID) {
                 if (!item.webView.webContents.isDestroyed()) {
+                    item.webView.webContents.close();
                     this._win!.contentView.removeChildView(item.webView);
                 }
             }
         });
         this._webViewList.splice(params.tabID - 1, 1);
-        console.log("webview剩余:", this._webViewList.length);
+        console.log("webview剩余:", this._webViewList.length, this._webViewList);
     }
 
     /** 隐藏所有webview */

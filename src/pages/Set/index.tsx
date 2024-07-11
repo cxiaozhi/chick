@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./index.scss";
 import { Button, Alert, message } from "antd";
 const Set = () => {
@@ -51,4 +51,4 @@ const Set = () => {
     );
 };
 
-export default Set;
+export default React.memo(Set);

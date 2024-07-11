@@ -1,27 +1,7 @@
-import PlatformList from "../components/Platform";
-import PlatformButton from "../components/PlatformButton";
 const GLOBAL: {
     ws: WebSocket | null;
-    TabList: {
-        props: {};
-        tab: JSX.Element;
-        content: JSX.Element;
-        search: string;
-        loadFinish: boolean;
-    }[];
-    captureTab: number;
 } = {
-    TabList: [
-        {
-            props: {},
-            tab: <PlatformButton />,
-            content: <PlatformList />,
-            search: "",
-            loadFinish: false,
-        },
-    ],
     ws: null,
-    captureTab: 0,
 };
 
 if (!GLOBAL.ws) {
