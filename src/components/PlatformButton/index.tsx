@@ -8,7 +8,9 @@ function PlatformButton(params: any) {
     return (
         <div
             className={global.captureTab == params.id ? "platform-button active" : "platform-button"}
-            onClick={(e) => {
+            onClick={(event) => {
+                console.log(event);
+
                 if (global.captureTab !== params.id) {
                     GLOBAL.ws!.send(JSON.stringify({ eventName: "hide-all-webview" }));
                     dispatch(activeTabBar({ id: params.id }));

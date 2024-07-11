@@ -7,8 +7,10 @@ import Set from "../../pages/Set";
 import Ad from "../../pages/Ad";
 import Singleton from "../../pages/Singleton";
 import GLOBAL from "../../common/global";
+import { useSelector } from "react-redux";
 
 function TopBar() {
+    const global = useSelector((state: any) => state.globalReducer);
     return (
         <div className="top-bar">
             <div className="left">小鸡采集</div>
@@ -34,7 +36,7 @@ function TopBar() {
                     onMouseUp={() => {
                         let msg: Message = {
                             eventName: "maximize-frame",
-                            params: { tabID: GLOBAL.captureTab },
+                            params: { tabID: global.captureTab },
                         };
                         GLOBAL.ws!.send(JSON.stringify(msg));
                     }}

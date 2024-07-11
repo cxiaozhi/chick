@@ -13,6 +13,8 @@ function TabContent() {
     const elementRef = useRef(null);
 
     const enter = (e?: any) => {
+        console.log(e);
+
         if (global.TabList[global.captureTab]) {
             if (global.TabList[global.captureTab].search.includes("http")) {
                 if (elementRef.current) {

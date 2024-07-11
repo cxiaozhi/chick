@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./index.scss";
-import { Button, Alert, message } from "antd";
+import { Button } from "antd";
 const Set = () => {
     let dirPath = localStorage.getItem("save-path");
     let [changePath, setChangePath] = useState("");

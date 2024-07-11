@@ -1,11 +1,14 @@
 import { useDispatch } from "react-redux";
 import "./index.scss";
 import { addTabBar } from "@/features/global/reducer";
+import tb from "@/assets/img/tb.webp";
+import xhs from "@/assets/img/xhs.webp";
+import tmall from "@/assets/img/tmall.webp";
 
 const platformList = [
-    { url: "src/assets/img/xhs.webp", nav: "https://www.xiaohongshu.com/explore" },
-    { url: "src/assets/img/tb.webp", nav: "https://taobao.com/" },
-    { url: "src/assets/img/tmall.webp", nav: "https://tmall.com/" },
+    { url: xhs, nav: "https://www.xiaohongshu.com/explore" },
+    { url: tb, nav: "https://taobao.com/" },
+    { url: tmall, nav: "https://tmall.com/" },
 ];
 
 function PlatformList() {
@@ -19,6 +22,7 @@ function PlatformList() {
                         <img
                             src={item.url}
                             onClick={(event) => {
+                                console.log(event);
                                 dispatch(addTabBar({ search: item.nav }));
                             }}
                         />

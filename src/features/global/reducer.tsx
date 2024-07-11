@@ -61,7 +61,7 @@ export const counterSlice = createSlice({
             }
             return state;
         },
-        decrement: (state) => {},
+
         addTabBar: (state, action: PayloadAction<{ search: string }>) => {
             console.log(state, action);
             let id = state.TabList.length;
@@ -149,7 +149,7 @@ export const counterSlice = createSlice({
     },
 });
 
-export const { updateTabBar, decrement, addTabBar, activeTabBar, delTabBar, updateRect, updateNodePos } = counterSlice.actions;
+export const { updateTabBar, addTabBar, activeTabBar, delTabBar, updateRect, updateNodePos } = counterSlice.actions;
 // 选择器等其他代码可以使用导入的 `RootState` 类型
 export const selectCount = (state: any) => state.counter;
 

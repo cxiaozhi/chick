@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws";
-import { BrowserWindow, WebContentsView, app, dialog, ipcMain, session, shell } from "electron";
+import { BrowserWindow, WebContentsView, app, dialog, ipcMain, shell } from "electron";
 import fs from "node:fs";
 import { MyWebview } from "./type";
 import downloadXHS from "./downloadXHS";
@@ -20,9 +20,9 @@ const errorInfo = {
 export default class WSS {
     private static _instance: WSS;
     private wss: WebSocketServer;
-    private _isMaxFrame: boolean = false;
+
     private _win: BrowserWindow | null = null;
-    private _dirname: string = "";
+
     private _ws: any = null;
     private _webViewList: MyWebview[] = [];
     constructor() {
@@ -112,6 +112,8 @@ export default class WSS {
             }
         });
         ipcMain.handle("open-dir", (event, dirPath) => {
+            console.log(event);
+
             if (!fs.existsSync(dirPath)) {
                 fs.mkdirSync(dirPath);
             }
@@ -122,14 +124,20 @@ export default class WSS {
         });
 
         ipcMain.handle("back", (event, params) => {
+            console.log(event);
+
             return this.back(params);
         });
 
         ipcMain.handle("next", (event, params) => {
+            console.log(event);
+
             return this.next(params);
         });
 
         ipcMain.handle("start-collection", async (event, params) => {
+            console.log(event);
+
             return await this.startCollection(params);
         });
     }
@@ -141,6 +149,8 @@ export default class WSS {
     }
 
     maximizeFrame(params: Params) {
+        console.log(params);
+
         if (this._win) {
             if (this._win.isMaximized()) {
                 this._win.restore();
@@ -235,6 +245,7 @@ export default class WSS {
             });
         } else {
             this._webViewList.forEach((item, index) => {
+                console.log(index);
                 if (item.tabID != params.tabID) {
                     item.webView.setBounds({ x: params.x, y: params.y, width: 0, height: 0 });
                 } else {
@@ -399,7 +410,7 @@ export default class WSS {
     }
 
     /** 给weiview添加事件 */
-    addLoadListener(view: WebContentsView) {}
+    addLoadListener() {}
 
     /** 切换标签 */
 
@@ -407,6 +418,7 @@ export default class WSS {
     downloadRes(view: WebContentsView, savePath: string, downloadURL: string): Promise<void> {
         return new Promise((resolve, reject) => {
             view.webContents.session.on("will-download", (e, item, webContents) => {
+                console.log(e, item, webContents, reject);
                 item.getMimeType();
                 savePath = savePath + item.getFilename();
                 item.setSavePath(savePath);

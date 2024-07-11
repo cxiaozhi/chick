@@ -13,6 +13,8 @@ function AddButton() {
         <div
             className="add-button"
             onClick={(event) => {
+                console.log(event);
+
                 if (global.TabList.length >= 6) return message.warning("当前页签创建已达最大值");
                 dispatch(addTabBar({ search: "" }));
             }}

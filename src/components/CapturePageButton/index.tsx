@@ -21,7 +21,7 @@ function CapturePageButton(params: any) {
             <div className="desc">新建采集页</div>
             <CloseOutlined
                 onClick={(e) => {
-                    console.log("删除页签iD", params.id);
+                    console.log("删除页签iD", params.id, e);
                     dispatch(delTabBar({ id: params.id }));
                     let msg: Message = {
                         eventName: "del-webview",

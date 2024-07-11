@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./index.scss";
 import CapturePage from "../../components/CapturePage";
 import AddButton from "../../components/AddButton";

@@ -1,5 +1,6 @@
 import React from "react";
 import "./index.scss";
+import GLOBAL from "@/common/global";
 
 const Sidebar = (props: { id: number; label: string; icon: JSX.Element; params: any; enterState: any }) => {
     const setClassName = () => {
@@ -20,6 +21,7 @@ const Sidebar = (props: { id: number; label: string; icon: JSX.Element; params: 
             className={setClassName()}
             onMouseUp={() => {
                 props.params[1](props.id);
+                GLOBAL.ws!.send(JSON.stringify({ eventName: "hide-all-webview" }));
             }}
             onMouseEnter={() => {
                 props.enterState[1](props.id);

@@ -22,9 +22,7 @@ function createWindow() {
         icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
         webPreferences: {
             preload: path.join(__dirname, "preload.mjs"),
-            // webSecurity: false,
-            // nodeIntegration: true,
-            // allowRunningInsecureContent: true,
+            devTools: false,
         },
         titleBarStyle: "hidden",
     });
@@ -34,8 +32,7 @@ function createWindow() {
     win.webContents.on("did-finish-load", () => {
         win?.webContents.send("main-process-message", new Date().toLocaleString());
     });
-    win.webContents.openDevTools();
-    win.webContents.on("will-navigate", (e, url) => {
+    win.webContents.on("will-navigate", (e) => {
         e.preventDefault();
     });
 
