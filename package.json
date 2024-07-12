@@ -1,11 +1,13 @@
 {
     "name": "chick",
     "private": true,
-    "version": "0.0.0",
+    "version": "0.0.1",
     "type": "module",
+    "description": "小鸡电商图文采集器",
+    "author": "ccz",
     "scripts": {
         "dev": "chcp 65001 && vite",
-        "build": "tsc && vite build && electron-builder",
+        "bd": "tsc && vite build && electron-builder",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview"
     },
@@ -45,5 +47,19 @@
     "main": "dist-electron/main.js",
     "optionalDependencies": {
         "utf-8-validate": "^6.0.4"
+    },
+    "build": {
+        "appId": "com.aiwan.chick",
+        "copyright": "ccz",
+        "productName": "小鸡电商图文采集器",
+        "icon": "logo.ico",
+        "win": {
+            "target": [
+                "portable"
+            ]
+        },
+        "directories": {
+            "output": "release/${version}"
+        }
     }
 }
