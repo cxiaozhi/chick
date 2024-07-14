@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from "electron";
-import { fileURLToPath } from "node:url";
+import {app, BrowserWindow} from "electron";
+import {fileURLToPath} from "node:url";
 import path from "node:path";
 import WSS from "./ws";
 
@@ -22,7 +22,7 @@ function createWindow() {
         icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
         webPreferences: {
             preload: path.join(__dirname, "preload.mjs"),
-            devTools: false,
+            devTools: true,
         },
         titleBarStyle: "hidden",
     });

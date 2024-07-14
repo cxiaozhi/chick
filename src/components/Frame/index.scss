@@ -7,7 +7,7 @@
 
     .top-bar {
         height: 3.125rem;
-        background-color: #0747a6;
+        background-color: #2e56a1;
         width: 100%;
         -webkit-user-select: none;
         -webkit-app-region: drag;
@@ -16,6 +16,24 @@
         padding-right: 1rem;
         box-sizing: border-box;
         align-items: center;
+        .left {
+            display: flex;
+            .app-icon {
+                width: 3.125rem;
+                margin-right: 0.625rem;
+                img {
+                    width: 100%;
+                }
+            }
+
+            .app-title {
+                margin-left: 0.625rem;
+                height: 3.375rem;
+                line-height: 3.375rem;
+                font-size: 0.875rem;
+                color: #fff;
+            }
+        }
 
         .right {
             min-width: 9.75rem;
@@ -23,7 +41,7 @@
             .custom-button {
                 border: none;
                 box-shadow: none;
-                background-color: #0747a6;
+                background-color: #2e56a1;
 
                 &:hover {
                     background-color: #4096ff;
@@ -33,7 +51,7 @@
             .close-button {
                 border: none;
                 box-shadow: none;
-                background-color: #0747a6;
+                background-color: #2e56a1;
 
                 &:hover {
                     background-color: #e81123;
@@ -44,8 +62,10 @@
 
     .bottom-bar {
         height: 1.5625rem;
-        background-color: #0747a6;
+        background-color: #2e56a1;
         -webkit-user-select: none;
+        text-align: center;
+        color: #dfe1e5;
     }
 
     .mid-view {
@@ -64,5 +84,4 @@
             flex-grow: 1;
         }
     }
-
 }

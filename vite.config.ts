@@ -1,8 +1,28 @@
-import { defineConfig } from "vite";
+import {defineConfig} from "vite";
 import path from "node:path";
 import electron from "vite-plugin-electron/simple";
 import react from "@vitejs/plugin-react";
+import {fileURLToPath} from "url";
+import {dirname} from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+function preserveDirnamePlugin() {
+    return {
+        name: "preserve-dirname",
+        transform(code: any, id: any) {
+            console.log(id);
+
+            if (id.endsWith(".js")) {
+                code = code.replace(/__dirname\$1/g, "__dirname");
+            }
+            return {
+                code,
+                map: null,
+            };
+        },
+    };
+}
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
@@ -31,5 +51,8 @@ export default defineConfig({
         alias: {
             "@": path.resolve(__dirname, "./src"),
         },
+    },
+    define: {
+        __dirname: JSON.stringify(process.cwd()),
     },
 });
