@@ -1,3 +1,13 @@
+@keyframes colorChange {
+    from {
+        filter: hue-rotate(0deg);
+    }
+
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+
 .singleton {
     padding: 1.25rem;
     display: flex;
@@ -7,10 +17,25 @@
 
     .top {
         display: flex;
+        position: relative;
 
         .behind {
             width: 100%;
             border-bottom: .0625rem solid #e7e7e7;
+        }
+
+        .ad-content {
+            position: absolute;
+            right: 1.875rem;
+            bottom: .625rem;
+
+            a {
+                background-image: linear-gradient(to right, red, lime, blue, fuchsia);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: colorChange 1s linear infinite;
+            }
         }
     }
 

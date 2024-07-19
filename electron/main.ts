@@ -1,5 +1,5 @@
-import {app, BrowserWindow} from "electron";
-import {fileURLToPath} from "node:url";
+import { app, BrowserWindow, shell } from "electron";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import WSS from "./ws";
 
@@ -27,13 +27,16 @@ function createWindow() {
         titleBarStyle: "hidden",
     });
 
-    win.setMinimumSize(853, 718);
+    win.setMinimumSize(1200, 900);
 
     win.webContents.on("did-finish-load", () => {
         win?.webContents.send("main-process-message", new Date().toLocaleString());
     });
     win.webContents.on("will-navigate", (e) => {
         e.preventDefault();
+        if (e.url.includes("qqtg.aiwan.store")) {
+            shell.openExternal(e.url);
+        }
     });
 
     if (VITE_DEV_SERVER_URL) {

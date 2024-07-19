@@ -35,3 +35,19 @@ interface Params {
     tabID?: number;
     [key: string]: any;
 }
+
+interface LinkItem {
+    type: string;
+    links: string[];
+    title: string;
+}
+
+interface TBLinkItem {
+    urls: UrlItem[];
+    title: string;
+}
+
+interface UrlItem {
+    type: string;
+    url: string;
+}

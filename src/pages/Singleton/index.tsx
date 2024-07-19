@@ -27,6 +27,9 @@ const Singleton = () => {
                     return <div key={index}>{tapButton(item, index)}</div>;
                 })}
                 <div className="behind">{<AddButton />}</div>
+                <div className="ad-content">
+                    <a href="http://qqtg.aiwan.store/">我是广告</a>
+                </div>
             </div>
             <div className="content">{<CapturePage />}</div>
         </div>

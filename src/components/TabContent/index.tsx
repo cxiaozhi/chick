@@ -1,10 +1,10 @@
-import {ArrowLeftOutlined, ArrowRightOutlined, ReloadOutlined} from "@ant-design/icons";
+import { ArrowLeftOutlined, ArrowRightOutlined, ReloadOutlined } from "@ant-design/icons";
 import "./index.scss";
-import {Input, Button, message} from "antd";
-import React, {useEffect, useRef, useState} from "react";
+import { Input, Button, message } from "antd";
+import React, { useEffect, useRef, useState } from "react";
 import GLOBAL from "../../common/global";
-import {useDispatch, useSelector} from "react-redux";
-import {updateNodePos, updateRect, updateTabBar} from "@/features/global/reducer";
+import { useDispatch, useSelector } from "react-redux";
+import { updateNodePos, updateRect, updateTabBar } from "@/features/global/reducer";
 function TabContent() {
     const global = useSelector((state: any) => state.globalReducer);
     const dispatch = useDispatch();
@@ -20,7 +20,7 @@ function TabContent() {
                 if (elementRef.current) {
                     let msg: Message = {
                         eventName: "search",
-                        params: {x: global.rect.x, y: global.rect.y, width: global.rect.width, height: global.rect.height, tabID: global.captureTab, url: global.TabList[global.captureTab].search},
+                        params: { x: global.rect.x, y: global.rect.y, width: global.rect.width, height: global.rect.height, tabID: global.captureTab, url: global.TabList[global.captureTab].search },
                     };
                     GLOBAL.ws!.send(JSON.stringify(msg));
                 }
@@ -33,13 +33,13 @@ function TabContent() {
     useEffect(() => {
         const resizeObserver = new ResizeObserver((entries) => {
             entries.forEach((entry) => {
-                dispatch(updateRect({width: entry.contentRect.width, height: entry.contentRect.height}));
+                dispatch(updateRect({ width: entry.contentRect.width, height: entry.contentRect.height }));
             });
         });
 
         const intersectionObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                dispatch(updateNodePos({x: entry.intersectionRect.x, y: entry.intersectionRect.y}));
+                dispatch(updateNodePos({ x: entry.intersectionRect.x, y: entry.intersectionRect.y }));
             });
         });
 
@@ -61,17 +61,17 @@ function TabContent() {
             if (data.eventName == "navigation") {
                 setCanBack(true);
                 if (data.params) {
-                    dispatch(updateTabBar({search: data.params.url, tabID: global.captureTab}));
+                    dispatch(updateTabBar({ search: data.params.url, tabID: global.captureTab }));
                 }
             } else if (data.eventName == "finish-load") {
                 let msg: Message = {
                     eventName: "inject-script",
-                    params: {url: global.TabList[global.captureTab].search, tabID: global.captureTab},
+                    params: { url: global.TabList[global.captureTab].search, tabID: global.captureTab },
                 };
                 window.ipcRenderer.invoke("inject-script", msg).then((_res) => {
                     if (data.params) {
                         if (data.params.tabID) {
-                            dispatch(updateTabBar({loadFinish: true, tabID: data.params.tabID}));
+                            dispatch(updateTabBar({ loadFinish: true, tabID: data.params.tabID }));
                         }
                     }
                 });
@@ -85,7 +85,7 @@ function TabContent() {
                 <div className={canBack ? "left-arrow" : "left-arrow gray"}>
                     <ArrowLeftOutlined
                         onClick={() => {
-                            window.ipcRenderer.invoke("back", {tabID: global.captureTab}).then((res) => {
+                            window.ipcRenderer.invoke("back", { tabID: global.captureTab }).then((res) => {
                                 setCanBack(res.canGoBack);
                                 setCanNext(res.canGoForward);
                             });
@@ -95,7 +95,7 @@ function TabContent() {
                 <div className={canNext ? "right-arrow" : "right-arrow gray"}>
                     <ArrowRightOutlined
                         onClick={() => {
-                            window.ipcRenderer.invoke("next", {tabID: global.captureTab}).then((res) => {
+                            window.ipcRenderer.invoke("next", { tabID: global.captureTab }).then((res) => {
                                 setCanBack(res.canGoBack);
                                 setCanNext(res.canGoForward);
                             });
@@ -111,7 +111,7 @@ function TabContent() {
                         onPressEnter={(event) => enter(event)}
                         value={global.TabList[global.captureTab]?.search}
                         onChange={(e) => {
-                            dispatch(updateTabBar({search: e.target.value, tabID: global.captureTab}));
+                            dispatch(updateTabBar({ search: e.target.value, tabID: global.captureTab }));
                         }}
                     ></Input>
                 </div>
@@ -120,10 +120,10 @@ function TabContent() {
                     onClick={async () => {
                         console.log("开始采集");
 
-                        dispatch(updateTabBar({loadFinish: false, tabID: global.captureTab}));
+                        dispatch(updateTabBar({ loadFinish: false, tabID: global.captureTab }));
                         let msg: Message = {
                             eventName: "start-collection",
-                            params: {tabID: global.captureTab, search: global.TabList[global.captureTab].search, savePath: localStorage.getItem("save-path")},
+                            params: { tabID: global.captureTab, search: global.TabList[global.captureTab].search, savePath: localStorage.getItem("save-path") },
                         };
                         let res = await window.ipcRenderer.invoke("start-collection", msg);
                         console.log("采集结束", res);
@@ -131,7 +131,7 @@ function TabContent() {
                             return message.error(res.msg);
                         }
 
-                        dispatch(updateTabBar({loadFinish: true, tabID: global.captureTab}));
+                        dispatch(updateTabBar({ loadFinish: true, tabID: global.captureTab }));
                         return message.success(res.msg);
                     }}
                     disabled={!global.TabList[global.captureTab].loadFinish}
