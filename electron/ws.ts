@@ -5,6 +5,7 @@ import { MyWebview } from "./type";
 import { injectXHS } from "./xhs";
 import { injectTB } from "./tbJS";
 import { injectTMall } from "./tmall";
+import packageJson from "../package.json";
 
 enum PlatFromEnum {
     "taobao",
@@ -157,7 +158,7 @@ export default class WSS {
 
         /** 获取版本号 */
         ipcMain.handle("get-version", async (_event) => {
-            return this._version;
+            return this.version;
         });
     }
 
@@ -576,7 +577,7 @@ export default class WSS {
         }
     }
 
-    private _version: string = "0.0.3";
+    private _version: string = packageJson.version;
     public get version(): string {
         return this._version;
     }
