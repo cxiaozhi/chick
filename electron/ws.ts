@@ -576,7 +576,7 @@ export default class WSS {
         }
     }
 
-    private _version: string = "0.0.2";
+    private _version: string = "0.0.3";
     public get version(): string {
         return this._version;
     }
