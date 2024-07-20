@@ -1,8 +1,11 @@
-import {WebSocketServer} from "ws";
-import {BrowserWindow, WebContentsView, app, dialog, ipcMain, shell} from "electron";
+import { WebSocketServer } from "ws";
+import { BrowserWindow, WebContentsView, app, dialog, ipcMain, shell } from "electron";
 import fs from "node:fs";
-import {MyWebview} from "./type";
-import {injectXHS} from "./xhs";
+import { MyWebview } from "./type";
+import { injectXHS } from "./xhs";
+import { injectTB } from "./tbJS";
+import { injectTMall } from "./tmall";
+import packageJson from "../package.json";
 
 enum PlatFromEnum {
     "taobao",
@@ -34,7 +37,7 @@ export default class WSS {
     private _webViewList: MyWebview[] = [];
 
     constructor() {
-        this.wss = new WebSocketServer({port: 8080});
+        this.wss = new WebSocketServer({ port: 8080 });
         this.initWebSocketServer();
     }
 
@@ -113,7 +116,7 @@ export default class WSS {
     listenIpcRender() {
         ipcMain.handle("change-path", async () => {
             if (this._win) {
-                const change = await dialog.showOpenDialog(this._win, {properties: ["openDirectory"]});
+                const change = await dialog.showOpenDialog(this._win, { properties: ["openDirectory"] });
                 if (!change.canceled) {
                     return change.filePaths[0];
                 }
@@ -155,7 +158,7 @@ export default class WSS {
 
         /** 获取版本号 */
         ipcMain.handle("get-version", async (_event) => {
-            return this._version;
+            return this.version;
         });
     }
 
@@ -185,7 +188,7 @@ export default class WSS {
 
     async changePath() {
         if (this._win) {
-            const change = await dialog.showOpenDialog(this._win, {properties: ["openDirectory"]});
+            const change = await dialog.showOpenDialog(this._win, { properties: ["openDirectory"] });
             if (!change.canceled) {
                 return change.filePaths[0];
             }
@@ -210,8 +213,6 @@ export default class WSS {
     }
 
     createWebContentsView(params: any) {
-        if (this._webViewList.length == 0) {
-        }
         const view = new WebContentsView();
         let item: MyWebview = {
             webView: view,
@@ -221,27 +222,27 @@ export default class WSS {
         view.webContents.addListener("did-finish-load", () => {
             let msg: Message = {
                 eventName: "finish-load",
-                params: {tabID: params.tabID},
+                params: { tabID: params.tabID },
             };
             this.send(msg);
         });
 
         view.webContents.setWindowOpenHandler((detail) => {
-            console.log(detail);
+            console.log("---->", detail);
             view.webContents.loadURL(detail.url);
             let msg: Message = {
                 eventName: "navigation",
-                params: {url: detail.url},
+                params: { url: detail.url },
             };
             this.send(msg);
-            return {action: "deny"};
+            return { action: "deny" };
         });
         this._webViewList.push(item);
         this._win!.contentView.addChildView(view);
         if (params.url) {
             view.webContents.loadURL(params.url);
         }
-        view.setBounds({x: params.x, y: params.y, width: params.width, height: params.height});
+        view.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
         console.log("webview剩余:", this._webViewList.length, this._webViewList);
     }
 
@@ -249,7 +250,7 @@ export default class WSS {
         console.log("更新View", params);
         this._webViewList.forEach((item) => {
             if (item.tabID == params.tabID) {
-                item.webView.setBounds({x: params.x, y: params.y, width: params.width, height: params.height});
+                item.webView.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
             }
         });
     }
@@ -258,15 +259,15 @@ export default class WSS {
         console.log("showWebView--->", this._webViewList, params);
         if (params.tabID == 0) {
             this._webViewList.forEach((item) => {
-                item.webView.setBounds({x: params.x, y: params.y, width: 0, height: 0});
+                item.webView.setBounds({ x: params.x, y: params.y, width: 0, height: 0 });
             });
         } else {
             this._webViewList.forEach((item, index) => {
                 console.log(index);
                 if (item.tabID != params.tabID) {
-                    item.webView.setBounds({x: params.x, y: params.y, width: 0, height: 0});
+                    item.webView.setBounds({ x: params.x, y: params.y, width: 0, height: 0 });
                 } else {
-                    item.webView.setBounds({x: params.x, y: params.y, width: params.width, height: params.height});
+                    item.webView.setBounds({ x: params.x, y: params.y, width: params.width, height: params.height });
                 }
             });
         }
@@ -301,7 +302,7 @@ export default class WSS {
     hideAllWebview() {
         console.log("隐藏所有webview");
         this._webViewList.forEach((item) => {
-            item.webView.setBounds({x: 0, y: 0, width: 0, height: 0});
+            item.webView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         });
     }
 
@@ -319,7 +320,7 @@ export default class WSS {
             }
         });
 
-        return {canGoBack, canGoForward};
+        return { canGoBack, canGoForward };
     }
     /** 前进 */
     next(params: any) {
@@ -332,7 +333,7 @@ export default class WSS {
                 canGoForward = item.webView.webContents.canGoForward();
             }
         });
-        return {canGoBack, canGoForward};
+        return { canGoBack, canGoForward };
     }
 
     /** 查找webView */
@@ -362,12 +363,12 @@ export default class WSS {
         if (params.params) {
             let platfrom = this.isWherePlatform(params.params.search);
             if (platfrom.data === null) {
-                return {data: false, msg: platfrom.msg};
+                return { data: false, msg: platfrom.msg };
             } else {
-                return {data: true, msg: platfrom.data};
+                return { data: true, msg: platfrom.data };
             }
         } else {
-            return {data: false, msg: errorInfo.params};
+            return { data: false, msg: errorInfo.params };
         }
     }
 
@@ -386,10 +387,10 @@ export default class WSS {
     }
 
     /** 获取保存路径 */
-    getSavePath(params: Message) {
+    getSavePath(params: Message, title: string) {
         let savePath = params.params?.savePath;
         if (!savePath) {
-            savePath = app.getPath("desktop") + "\\采集结果\\";
+            savePath = app.getPath("desktop") + "\\采集结果\\" + title + "\\";
         }
         return savePath;
     }
@@ -403,29 +404,40 @@ export default class WSS {
                 console.log("event: %s, level: %s, message: %s, line: %s, sourceId: %s", event, level, message, line, sourceId);
             }
         });
-
-        let jsScript = fs.readFileSync("./electron/tbJS.ts", "utf8");
-        const res = await webView.webContents.executeJavaScript(`${jsScript}`);
-        for (let index = 0; index < res.length; index++) {
-            const url = res[index];
-            await this.downloadVideo(webView, this.getSavePath(params), url);
+        const res: TBLinkItem = await webView.webContents.executeJavaScript("injectTB()");
+        console.log("淘宝脚本注入", res);
+        for (let index = 0; index < res.urls.length; index++) {
+            const urlItem = res.urls[index];
+            if (urlItem.type == "video") {
+                await this.downloadVideo(webView, this.getSavePath(params, res.title), urlItem.url);
+            } else {
+                await this.downloadImage(webView, this.getSavePath(params, res.title), urlItem.url);
+            }
         }
-        return {data: true, msg: "采集完成"};
+        return { data: true, msg: "采集完成" };
     }
 
     /** 采集天猫 */
-    collectionTMall(params: Message) {
+    async collectionTMall(params: Message) {
         let webView: WebContentsView | null = this.findWebViewByTabID(params);
         if (!webView) return null;
-        webView.webContents;
-        return {data: true, msg: "采集完成"};
+        const res: TBLinkItem = await webView.webContents.executeJavaScript("injectTMall()");
+        console.log("天猫脚本注入", res);
+        for (let index = 0; index < res.urls.length; index++) {
+            const urlItem = res.urls[index];
+            if (urlItem.type == "video") {
+                await this.downloadVideo(webView, this.getSavePath(params, res.title), urlItem.url);
+            } else {
+                await this.downloadImage(webView, this.getSavePath(params, res.title), urlItem.url);
+            }
+        }
+        return { data: true, msg: "采集完成" };
     }
 
     /** 下载视频 */
     downloadVideo(view: WebContentsView, savePath: string, downloadURL: string): Promise<void> {
         return new Promise((resolve) => {
             console.log("下载地址:", downloadURL);
-
             view.webContents.session.on("will-download", (e, item) => {
                 let mimeType = item.getMimeType();
                 // let resSuffix = mimeType.split("/")[1];
@@ -435,7 +447,7 @@ export default class WSS {
                 // }
                 savePath = savePath + fimeName;
                 item.setSavePath(savePath);
-                console.log(e, item, mimeType);
+                // console.log(e, item, mimeType);
                 resolve();
             });
 
@@ -459,7 +471,7 @@ export default class WSS {
                     savePath = savePath + suffix;
                 }
                 item.setSavePath(savePath);
-                console.log(e, item, mimeType);
+                // console.log(e, item, mimeType);
                 item.once("done", (_event, state) => {
                     if (state == "completed") {
                         resolve();
@@ -485,18 +497,19 @@ export default class WSS {
         const res: {
             type: string;
             links: string[];
+            title: string;
         } = await webView.webContents.executeJavaScript("injectXHS()");
         if (params.params) {
             console.log(res);
             for (let index = 0; index < res.links.length; index++) {
                 const url = res.links[index];
                 if (res.type == "video") {
-                    await this.downloadVideo(webView, this.getSavePath(params), url);
+                    await this.downloadVideo(webView, this.getSavePath(params, res.title), url);
                 } else {
-                    await this.downloadImage(webView, this.getSavePath(params), url);
+                    await this.downloadImage(webView, this.getSavePath(params, res.title), url);
                 }
             }
-            return {data: true, msg: "采集完成"};
+            return { data: true, msg: "采集完成" };
         }
     }
 
@@ -516,33 +529,33 @@ export default class WSS {
     }
 
     noSupport() {
-        return {data: null, msg: errorInfo.nonsupport};
+        return { data: null, msg: errorInfo.nonsupport };
     }
 
     /** 检测淘宝链接 */
     checkTaoBaoUrl(url: string): CheckRes {
-        if (url.includes("itemIds") || url.includes("item.taobao.com")) {
-            return {data: PlatFromEnum.taobao, msg: null};
+        if (url.startsWith("https://item.taobao.com") || url.startsWith("http://click.mz.simba.taobao.com")) {
+            return { data: PlatFromEnum.taobao, msg: null };
         } else {
-            return {data: null, msg: errorInfo.taobaoDetail};
+            return { data: null, msg: errorInfo.taobaoDetail };
         }
     }
 
     /** 检测天猫链接 */
     checkTmallUrl(url: string): CheckRes {
         if (url.includes("tmall.com") && url.includes("detail.tmall.com")) {
-            return {data: PlatFromEnum.tmall, msg: null};
+            return { data: PlatFromEnum.tmall, msg: null };
         } else {
-            return {data: null, msg: errorInfo.tmallDetail};
+            return { data: null, msg: errorInfo.tmallDetail };
         }
     }
 
     /** 检测小红书链接 */
     checkXhsUrl(url: string): CheckRes {
-        if (url.includes("xhslink")) {
-            return {data: PlatFromEnum.xhs, msg: null};
+        if (url.includes("xhslink") || url.startsWith("https://www.xiaohongshu.com/explore/")) {
+            return { data: PlatFromEnum.xhs, msg: null };
         } else {
-            return {data: null, msg: errorInfo.xhsError};
+            return { data: null, msg: errorInfo.xhsError };
         }
     }
 
@@ -553,16 +566,18 @@ export default class WSS {
         if (webView && params.params) {
             let url = params.params.url;
             if (this.ifFromTaoBao(url)) {
+                await webView.webContents.executeJavaScript(injectTB.toString());
             } else if (this.ifFromXhs(url)) {
                 console.log("小红书注入脚本");
                 await webView.webContents.executeJavaScript(injectXHS.toString());
                 return true;
             } else if (this.ifFromTmall(url)) {
+                await webView.webContents.executeJavaScript(injectTMall.toString());
             }
         }
     }
 
-    private _version: string = "0.0.2";
+    private _version: string = packageJson.version;
     public get version(): string {
         return this._version;
     }

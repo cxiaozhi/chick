@@ -1,7 +1,7 @@
-import {CloseOutlined, DownloadOutlined, ExpandAltOutlined, MinusOutlined, SettingOutlined, SoundOutlined} from "@ant-design/icons";
+import { CloseOutlined, DownloadOutlined, ExpandAltOutlined, MinusOutlined, SettingOutlined, SoundOutlined } from "@ant-design/icons";
 import "./index.scss";
-import React, {useState} from "react";
-import {Button} from "antd";
+import React, { useState } from "react";
+import { Button } from "antd";
 import Sidebar from "../Sidebar";
 import Set from "../../pages/Set";
 import Ad from "../../pages/Ad";
@@ -15,7 +15,7 @@ function TopBar() {
     const dispatch = useDispatch();
     const global = useSelector((state: any) => state.globalReducer);
     window.ipcRenderer.invoke("get-version").then((res) => {
-        dispatch(updateVersion({version: res}));
+        dispatch(updateVersion({ version: res }));
     });
     return (
         <div className="top-bar">
@@ -28,7 +28,7 @@ function TopBar() {
             <div className="right">
                 <Button
                     // @ts-ignore
-                    style={{marginLeft: 20, "-webkit-app-region": "no-drag"}}
+                    style={{ marginLeft: 20, "-webkit-app-region": "no-drag" }}
                     type="primary"
                     icon={<MinusOutlined />}
                     onMouseUp={() => {
@@ -41,13 +41,13 @@ function TopBar() {
                 />
                 <Button
                     // @ts-ignore
-                    style={{marginLeft: 20, "-webkit-app-region": "no-drag"}}
+                    style={{ marginLeft: 20, "-webkit-app-region": "no-drag" }}
                     type="primary"
                     icon={<ExpandAltOutlined />}
                     onMouseUp={() => {
                         let msg: Message = {
                             eventName: "maximize-frame",
-                            params: {tabID: global.captureTab},
+                            params: { tabID: global.captureTab },
                         };
                         GLOBAL.ws!.send(JSON.stringify(msg));
                     }}
@@ -55,7 +55,7 @@ function TopBar() {
                 />
                 <Button
                     // @ts-ignore
-                    style={{marginLeft: 20, "-webkit-app-region": "no-drag"}}
+                    style={{ marginLeft: 20, "-webkit-app-region": "no-drag" }}
                     type="primary"
                     icon={<CloseOutlined />}
                     onMouseUp={() => {
@@ -72,7 +72,7 @@ function TopBar() {
 }
 
 function BottomBar() {
-    return <div className="bottom-bar">Copyright © 2024 小鸡采集</div>;
+    return <div className="bottom-bar">Copyright © 2024 - 2024 小鸡采集</div>;
 }
 
 const menuList = [

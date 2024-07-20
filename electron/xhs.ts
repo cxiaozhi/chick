@@ -35,12 +35,10 @@ export async function injectXHS() {
     };
 
     const exploreDeal = async (note: any) => {
-        let item: {
-            type: string;
-            links: string[];
-        } = {
+        let item: LinkItem = {
             type: "",
             links: [],
+            title: "",
         };
         if (note.type === "normal") {
             item.type = "img";
@@ -49,6 +47,7 @@ export async function injectXHS() {
             item.type = "video";
             item.links = generateVideoUrl(note);
         }
+        item.title = note.title;
         return item;
     };
     let note = extractNoteInfo();

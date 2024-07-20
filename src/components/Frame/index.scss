@@ -16,11 +16,14 @@
         padding-right: 1rem;
         box-sizing: border-box;
         align-items: center;
+
         .left {
             display: flex;
+
             .app-icon {
                 width: 3.125rem;
                 margin-right: 0.625rem;
+
                 img {
                     width: 100%;
                 }
@@ -65,7 +68,7 @@
         background-color: #2e56a1;
         -webkit-user-select: none;
         text-align: center;
-        color: #dfe1e5;
+        color: #bebebe;
     }
 
     .mid-view {

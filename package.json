@@ -1,7 +1,7 @@
 {
     "name": "chick",
     "private": true,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "module",
     "description": "小鸡电商图文采集器",
     "author": "ccz",
@@ -53,13 +53,16 @@
         "copyright": "ccz",
         "productName": "小鸡电商图文采集器",
         "icon": "logo.ico",
+        "mac": {
+            "target": "dmg"
+        },
         "win": {
             "target": [
-                "portable"
+                "zip"
             ]
         },
         "directories": {
-            "output": "release/小鸡电商图文采集器v${version}"
+            "output": "release/${productName}${version}"
         }
     }
 }

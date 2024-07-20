@@ -1,4 +1,4 @@
-export function injectTB() {
+export function injectTMall() {
     let title = document.getElementsByTagName("h1");
     let item: TBLinkItem = {
         urls: [],
@@ -23,7 +23,7 @@ export function injectTB() {
     };
 
     const getImgUrl = () => {
-        let imgUrls: HTMLCollection = document.getElementsByClassName("PicGallery--thumbnailPic--nbPtwNj");
+        let imgUrls: HTMLCollection = document.getElementsByClassName("PicGallery--mainPic--34u4Jrw");
         for (let index = 0; index < imgUrls.length; index++) {
             const img = imgUrls[index];
             let url = img.getAttribute("src");
@@ -34,9 +34,6 @@ export function injectTB() {
                 }
                 if (url.endsWith("_.webp")) {
                     url = url.replace("_.webp", "");
-                }
-                if (url.endsWith("_240x10000Q75.jpg")) {
-                    url = url.replace("_240x10000Q75.jpg", "");
                 }
                 let urlItem: UrlItem = {
                     url,
