@@ -9,7 +9,7 @@ import Singleton from "../../pages/Singleton";
 import GLOBAL from "../../common/global";
 import {useDispatch, useSelector} from "react-redux";
 import {updateVersion} from "@/features/global/reducer";
-
+import appIcon from "@/assets/img/icon.webp";
 function TopBar() {
     console.log("执行了");
     const dispatch = useDispatch();
@@ -21,7 +21,7 @@ function TopBar() {
         <div className="top-bar">
             <div className="left">
                 <div className="app-icon">
-                    <img src="/src/assets/img/icon.webp" alt="" />
+                    <img src={appIcon} alt="" />
                 </div>
                 <div className="app-title">小鸡电商图文采集器 v{global.version}</div>
             </div>
