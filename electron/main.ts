@@ -1,8 +1,7 @@
-import { app, BrowserWindow, shell } from "electron";
-import { fileURLToPath } from "node:url";
+import {app, BrowserWindow, shell} from "electron";
+import {fileURLToPath} from "node:url";
 import path from "node:path";
 import WSS from "./ws";
-console.log("ssss", import.meta.env.MODE);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
